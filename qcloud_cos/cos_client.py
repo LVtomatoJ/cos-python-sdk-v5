@@ -8482,7 +8482,59 @@ class CosS3Client(object):
 
         data = xml_to_dict(rt.content)
         return data
-
-
+    
+    def ci_add_zip_file_job(self,Bucket,Prefix,Output,QueueId,Region,**kwargs):
+        body = {
+        'Request': {
+            'Tag': 'FileCompress',
+            'Operation':{
+                'FileCompressConfig':{
+                    'Prefix':Prefix,
+                    'Format':'zip',
+                    'Flatten':0
+                },
+                'Output':{
+                    'Region':Region,
+                    'Bucket':Bucket,
+                    'Object':Output
+                }
+            },
+            'QueueId':QueueId
+        }
+    }
+        xml_request = no_root_format_xml(data=body)
+        print(xml_request)
+        headers = mapped(kwargs)
+        final_headers = {}
+        params = {}
+        for key in headers:
+            if key.startswith("response"):
+                params[key] = headers[key]
+            else:
+                final_headers[key] = headers[key]
+        headers = final_headers
+        path = "/file_jobs"
+        url = self._conf.uri(bucket=Bucket, path=path, endpoint=self._conf._endpoint_ci)
+        rt = self.send_request(
+            method='POST',
+            url=url,
+            bucket=Bucket,
+            data=xml_request,
+            auth=CosS3Auth(self._conf, path),
+            headers=headers)
+        data = xml_to_dict(rt.content)
+        return data
+    
+    def ci_auditing_zip_query(self,Bucket,JobID):
+        path = "/file_jobs/"+JobID
+        url = self._conf.uri(bucket=Bucket, path=path, endpoint=self._conf._endpoint_ci)
+        rt = self.send_request(
+            method='GET',
+            url=url,
+            bucket=Bucket,
+            auth=CosS3Auth(self._conf, path),
+            headers={})
+        data = xml_to_dict(rt.content)
+        return data
 if __name__ == "__main__":
     pass
