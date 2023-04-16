@@ -219,6 +219,10 @@ def format_xml(data, root):
     xml_config = unparse(input_dict=input_dict).encode('utf-8')
     return xml_config
 
+def no_root_format_xml(data):
+    """将dict转换为xml, xml_config是一个bytes 无root参数"""
+    xml_config = unparse(input_dict=data).encode('utf-8')
+    return xml_config
 
 def format_values(data):
     """格式化headers和params中的values为bytes"""
